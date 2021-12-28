@@ -1,0 +1,18 @@
+{
+    "name": "@us/config",
+    "version": "0.0.0",
+    "description": "Config package",
+    "author": "Mateusz Dropinski <mateuszdropinski5@gmail.com>",
+    "license": "MIT",
+    "main": "src/index.ts",
+    "scripts": {},
+    "dependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.1.0",
+        "@typescript-eslint/parser": "^5.1.0",
+        "eslint-plugin-import": "^2.25.2"
+    },
+    "peerDependencies": {
+        "eslint": "^7.29.0",
+        "typescript": "^4.3.4"
+    }
+}

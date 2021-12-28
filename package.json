@@ -1,0 +1,23 @@
+{
+    "name": "us",
+    "version": "0.0.0",
+    "private": "true",
+    "repository": "https://github.com/MateuszDropinski/uslugi_sieciowe.git",
+    "author": "Mateusz Dropinski <mateuszdropinski5@gmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "start": "cd packages/frontend && yarn start",
+        "lint": "lerna run lint",
+        "prepare": "husky install",
+        "build": "yarn && cd packages/frontend && npm run build"
+    },
+    "devDependencies": {
+        "husky": "^7.0.4",
+        "lerna": "^4.0.0"
+    },
+    "workspaces": {
+        "packages": [
+            "packages/*"
+        ]
+    }
+}
