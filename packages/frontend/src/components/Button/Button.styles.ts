@@ -1,11 +1,13 @@
 import styled from 'styled-components';
+
 import {
     Color,
     getColor,
     getElevation,
     getFontColor,
     getFontFamily,
-    getFontSize, LightnessLevel
+    getFontSize,
+    LightnessLevel,
 } from '../../theme';
 
 export const StyledPrimaryButton = styled.button<{ color: Color, disabled: boolean, hasLabel: boolean }>`
