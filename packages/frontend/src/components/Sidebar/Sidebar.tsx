@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { usersDataWithoutCurrentSelector } from '../../store/users/selectors';
-import { getElevation, getFontSize } from '../../theme';
+import { getColor, getElevation, getFontSize, LightnessLevel } from '../../theme';
+import { messagesActiveUserSelector } from '../../store/messages/selectors';
+import { setActiveUser } from '../../store/messages/slice';
 
 const StyledWrapper = styled.div`
     display: flex;
@@ -15,9 +17,11 @@ const StyledWrapper = styled.div`
     width: 25%;
     height: 100%;
     box-shadow: ${getElevation(12)};
+
+    font-size: ${getFontSize('h3')};
 `;
 
-const StyledUser = styled.div`
+const StyledUser = styled.div<{ isActive: boolean }>`
     padding: 1rem;
     width: 100%;
     border-radius: 3px;
@@ -25,6 +29,8 @@ const StyledUser = styled.div`
     cursor: pointer;
     transition: .25s;
     box-shadow: ${getElevation(3)};
+    background-color: ${({ isActive }) =>
+        getColor(isActive ? 'main' : 'background', { lightnessOffset: LightnessLevel.Lighter3 })};
 
     text-align: center;
     font-weight: bold;
@@ -36,13 +42,25 @@ const StyledUser = styled.div`
 `;
 
 export const Sidebar = () => {
+    const dispatch = useAppDispatch();
+
     const users = useAppSelector(usersDataWithoutCurrentSelector);
-    console.log(users);
+    const activeUser = useAppSelector(messagesActiveUserSelector);
+
+    const onClick = (email) => dispatch(setActiveUser(email));
 
     return (
         <StyledWrapper>
+            <div>Users:</div>
             {
-                users.map(({ name, email }) => <StyledUser key={email}>{name}</StyledUser>)
+                users.map(({ name, email }) => (
+                    <StyledUser
+                        key={email}
+                        onClick={() => onClick(email)}
+                        isActive={email === activeUser}>
+                        {name}
+                    </StyledUser>
+                ))
             }
         </StyledWrapper>
     );

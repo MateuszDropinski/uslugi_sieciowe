@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
-export const getAuthErrorMessage = (code: string) => authErrors[code];
+import * as _ from 'lodash/fp';
+
+export const getAuthErrorMessage = (code: string) => authErrors[_.flowRight(_.last, _.split('/'))(code)];
 export const authErrors = {
     'admin-restricted-operation': 'This operation is restricted to administrators only.',
     'argument-error': '',

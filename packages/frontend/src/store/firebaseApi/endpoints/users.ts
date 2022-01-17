@@ -3,6 +3,7 @@ import * as _ from 'lodash/fp';
 import { firebaseApi } from '../firebaseApi';
 import { firebaseInterface } from '../../../firebase/firebaseInterface';
 import { setUsers } from '../../users/slice';
+import { getEmailKey } from './utils';
 
 export const usersEndpoint = firebaseApi.injectEndpoints({
     overrideExisting: false,
@@ -23,11 +24,10 @@ export const usersEndpoint = firebaseApi.injectEndpoints({
         }),
         setUserData: build.mutation<string, string>({
             async queryFn(name) {
-                console.log(firebaseInterface.getCurrentUser());
                 try {
                     await firebaseInterface.setValue(
                         `/users/${firebaseInterface.getUid()}`,
-                        { name, email: firebaseInterface.getCurrentUser().email }
+                        { name, email: getEmailKey() }
                     );
                     return { data: name };
                 } catch (error) {

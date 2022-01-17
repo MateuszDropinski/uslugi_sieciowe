@@ -30,7 +30,7 @@ const StyledInput = styled(Input)`
 `;
 
 export const LoginPage = () => {
-    const [signIn] = useSignInMutation();
+    const [signIn, { error }] = useSignInMutation();
 
     const [email, setEmail] = React.useState<string>('');
     const [password, setPassword] = React.useState<string>('');
@@ -50,7 +50,8 @@ export const LoginPage = () => {
                     type="password"
                     value={password}
                     onChange={setPassword} />
-                <Button onClick={onClick} label='Zaloguj się' icon='signIn' />
+                <Button onClick={onClick} label='Log in' icon='signIn' />
+                { error?.message }
             </StyledContent>
         </StyledWrapper>
     );

@@ -9,6 +9,7 @@ import { UserData } from '../components/UserData/UserData';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { Chat } from '../components/Chat/Chat';
 import { getColor, LightnessLevel } from '../theme';
+import { useMessagesQuery } from '../store/firebaseApi/endpoints/messages';
 
 const StyledWrapper = styled.div`
     display: flex;
@@ -38,6 +39,7 @@ const AppWrapper = styled.div`
 
 export const MainPage = () => {
     useUsersDataQuery();
+    useMessagesQuery();
 
     const isInitialized = useAppSelector(usersIsInitializedSelector);
     const userData = useAppSelector(usersDataCurrentSelector);

@@ -10,7 +10,7 @@ import {
     IoArrowForwardOutline,
     IoSettingsSharp,
 } from 'react-icons/io5';
-import { FiCheck } from 'react-icons/fi';
+import { FiCheck, FiSend } from 'react-icons/fi';
 import { FaPen } from 'react-icons/fa';
 import { BiBell, BiCake, BiErrorCircle, BiTask } from 'react-icons/bi';
 import { MdMoreTime } from 'react-icons/md';
@@ -33,6 +33,7 @@ export const icons = {
     task: BiTask,
     settings: IoSettingsSharp,
     addTime: MdMoreTime,
+    send: FiSend,
 };
 
 export type IconName = keyof typeof icons;

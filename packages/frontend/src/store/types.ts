@@ -3,8 +3,9 @@ import { ThunkAction, ThunkDispatch as ThunkDispatchBase } from '@reduxjs/toolki
 import { rootReducer } from './reducer';
 import { store } from './store';
 import { UsersAction } from './users/slice';
+import { MessagesAction } from './messages/slice';
 
-export type RootAction = UsersAction;
+export type RootAction = UsersAction | MessagesAction;
 
 export type State = ReturnType<typeof rootReducer>;
 

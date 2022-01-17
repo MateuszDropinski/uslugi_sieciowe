@@ -15,7 +15,8 @@ type Props = Omit<React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaEleme
     label?: string;
     selectOnFocus?: boolean;
     error?: string;
-    type?: React.InputHTMLAttributes<HTMLInputElement>['type'] | 'textarea'
+    type?: React.InputHTMLAttributes<HTMLInputElement>['type'] | 'textarea';
+    onEnter?: () => void;
 }
 
 export const Input = ({
@@ -31,6 +32,7 @@ export const Input = ({
     selectOnFocus = false,
     error,
     type,
+    onEnter,
     ...props
 }: Props) => {
     const [stateValue, setStateValue] = React.useState<string>('');
@@ -57,6 +59,12 @@ export const Input = ({
         }
     };
 
+    const handleOnKeyPress = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (e.code === 'Enter' && !e.shiftKey) {
+            onEnter?.();
+        }
+    };
+
     const inputBaseProps = {
         ...props,
         error: !!error,
@@ -66,6 +74,7 @@ export const Input = ({
         title: stateValue,
         onBlur: handleOnBlur,
         onChange: handleOnChange,
+        onKeyPress: handleOnKeyPress,
     };
 
     return (

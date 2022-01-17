@@ -30,7 +30,7 @@ export const UserData = () => {
                 label="Przed przejściem dalej podaj swoją nazwę"
                 onChange={setName}
                 value={name} />
-            <Button label='Zapisz nazwę' icon='success' onClick={onClick} />
+            <Button label='Zapisz nazwę' icon='check' onClick={onClick} />
         </StyledWrapper>
     );
 };
