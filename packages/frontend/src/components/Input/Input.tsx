@@ -2,23 +2,23 @@ import React from 'react';
 import * as _ from 'lodash/fp';
 
 import { IconName, IconSize, iconSizes } from '../Icon';
-import { StyledWrapper, StyledInput, StyledIcon, StyledLabel } from './Input.styles';
+import { StyledWrapper, StyledTextarea, StyledInput, StyledIcon, StyledLabel, StyledInputWrapper, StyledError } from './Input.styles';
 
-type Props<T extends string | number> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
-    value?: T;
-    onChange: ((val: T) => void) | React.Dispatch<React.SetStateAction<T>>;
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement>, 'onChange' | 'type'> & {
+    value?: string;
+    onChange: ((val: string) => void) | React.Dispatch<React.SetStateAction<string>>;
     onClick?: () => void;
-    onBlur?: (val: T) => void;
+    onBlur?: (val: string) => void;
     icon?: IconName;
     iconSize?: IconSize;
     onIconClick?: () => void;
     label?: string;
-    min?: number;
-    max?: number;
     selectOnFocus?: boolean;
+    error?: string;
+    type?: React.InputHTMLAttributes<HTMLInputElement>['type'] | 'textarea'
 }
 
-export const Input = <T extends string | number>({
+export const Input = ({
     className,
     onChange,
     onClick,
@@ -28,42 +28,44 @@ export const Input = <T extends string | number>({
     onIconClick,
     disabled = false,
     label,
-    min,
-    max,
     selectOnFocus = false,
+    error,
+    type,
     ...props
-}: Props<T>) => {
+}: Props) => {
     const [stateValue, setStateValue] = React.useState<string>('');
-
-    const getTypedValue = (valueToType: string | number): T =>
-        (props.type === 'number' ? Number(valueToType) : `${valueToType}`) as T;
 
     React.useEffect(() => {
         !_.isUndefined(value) && setStateValue(`${value}`);
     }, [value]);
 
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const typedValue = getTypedValue(e.target.value);
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setStateValue(e.target.value);
-        onChange(typedValue);
+        onChange(e.target.value);
     };
 
-    const getValueBetween = (val: number) => Math.max(min ?? val, Math.min(max ?? val, val));
-
-    const handleOnBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const properValue = props.type === 'number'
-            ? getTypedValue(getValueBetween(Number(e.target.value)))
-            : getTypedValue(e.target.value);
-        setStateValue(`${properValue}`);
-        props.onBlur?.(properValue);
+    const handleOnBlur = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setStateValue(e.target.value);
+        props.onBlur?.(e.target.value);
     };
 
-    const handleOnFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleOnFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         props.onFocus?.(e);
         if (selectOnFocus) {
             // It needs to run after first useEffect which sets state depending on prop
             setTimeout(() => e.target.select());
         }
+    };
+
+    const inputBaseProps = {
+        ...props,
+        error: !!error,
+        onFocus: handleOnFocus,
+        disabled,
+        value: stateValue,
+        title: stateValue,
+        onBlur: handleOnBlur,
+        onChange: handleOnChange,
     };
 
     return (
@@ -72,23 +74,26 @@ export const Input = <T extends string | number>({
             disabled={disabled}
             className={className}>
             {label && <StyledLabel>{label}</StyledLabel>}
-            <StyledInput
-                {...props}
-                onFocus={handleOnFocus}
-                disabled={disabled}
-                value={stateValue}
-                title={`${stateValue}`}
-                additionalPadding={icon ? iconSizes[iconSize] : '0px' }
-                onBlur={handleOnBlur}
-                onChange={handleOnChange} />
-            {
-                icon && (
-                    <StyledIcon
-                        onClick={onIconClick}
-                        name={icon}
-                        size={iconSize} />
-                )
-            }
+            <StyledInputWrapper>
+                {
+                    type === 'textarea'
+                        ? (<StyledTextarea {...inputBaseProps} />)
+                        : (
+                            <StyledInput {...inputBaseProps}
+                                type={type}
+                                additionalPadding={icon ? iconSizes[iconSize] : '0px' } />
+                        )
+                }
+                {
+                    icon && type !== 'textarea' && (
+                        <StyledIcon
+                            onClick={onIconClick}
+                            name={icon}
+                            size={iconSize} />
+                    )
+                }
+            </StyledInputWrapper>
+            {error && <StyledError>{error}</StyledError>}
         </StyledWrapper>
     );
 };

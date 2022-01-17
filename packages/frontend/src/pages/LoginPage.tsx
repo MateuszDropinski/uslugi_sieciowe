@@ -43,12 +43,10 @@ export const LoginPage = () => {
                 <StyledInput
                     autoFocus
                     label='E-mail'
-                    placeholder="Wpisz e-mail"
                     onChange={setEmail}
                     value={email} />
                 <StyledInput
-                    label='Hasło'
-                    placeholder="Wpisz hasło"
+                    label='Password'
                     type="password"
                     value={password}
                     onChange={setPassword} />

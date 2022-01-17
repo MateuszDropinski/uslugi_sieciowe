@@ -1,7 +1,17 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { getColor, getFontColor, getFontFamily, getFontSize, LightnessLevel } from '../../theme';
 import { Icon } from '../Icon';
+
+const getInputBackgroundColor = (disabled, error) => {
+    if (disabled) {
+        return getColor('grey', { lightnessOffset: LightnessLevel.Darker3 });
+    }
+
+    return error
+        ? getColor('red', { lightnessOffset: LightnessLevel.Lighter4 })
+        : getColor('background');
+};
 
 export const StyledIcon = styled(Icon)<{ onClick: () => void }>`
     position: absolute;
@@ -15,14 +25,15 @@ export const StyledIcon = styled(Icon)<{ onClick: () => void }>`
     color: ${getFontColor('secondaryDark')};
 `;
 
-export const StyledInput = styled.input<{ additionalPadding: string }>`
+export const StyledInputWrapper = styled.div`
+    position: relative;
+`;
+
+const StyledInputBase = css<{ error: boolean; disabled: boolean }>`
     width: 100%;
-    padding: ${({ additionalPadding }) => `.5rem calc(1rem + ${additionalPadding}) .5rem 1rem`};
-    border: 1px solid ${getFontColor('secondaryDark')};
+    border: 1px solid ${({ error }) => error ? getColor('red') : getFontColor('secondaryDark')};
     border-radius: 5px;
-    background: ${({ disabled }) => disabled
-        ? getColor('grey', { lightnessOffset: LightnessLevel.Darker3 })
-        : getColor('background')};
+    background: ${({ disabled, error }) => getInputBackgroundColor(disabled, error)};
 
     outline: none;
     transition: border .25s;
@@ -39,6 +50,18 @@ export const StyledInput = styled.input<{ additionalPadding: string }>`
             color: ${getColor('main', { lightnessOffset: LightnessLevel.Darker2 })};
         }
     }
+`;
+
+export const StyledInput = styled.input<{ additionalPadding: string; error: boolean; disabled: boolean }>`
+    ${StyledInputBase};
+
+    padding: ${({ additionalPadding }) => `.5rem calc(1rem + ${additionalPadding}) .5rem 1rem`};
+`;
+
+export const StyledTextarea = styled.textarea<{ error: boolean; disabled: boolean }>`
+    ${StyledInputBase};
+
+    padding: .5rem;
 `;
 
 export const StyledWrapper = styled.div<{ disabled: boolean }>`
@@ -63,4 +86,9 @@ export const StyledWrapper = styled.div<{ disabled: boolean }>`
 export const StyledLabel = styled.div`
     font-size: ${getFontSize('caption')};
     color: ${getFontColor('secondaryDark')};
+`;
+
+export const StyledError = styled.div`
+    font-size: ${getFontSize('caption')};
+    color: ${getColor('red')};
 `;
