@@ -60,8 +60,9 @@ export const Input = ({
     };
 
     const handleOnKeyPress = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        if (e.code === 'Enter' && !e.shiftKey) {
-            onEnter?.();
+        if (e.code === 'Enter' && !e.shiftKey && onEnter) {
+            e.preventDefault();
+            onEnter();
         }
     };
 

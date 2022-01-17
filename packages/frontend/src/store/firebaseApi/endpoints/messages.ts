@@ -5,6 +5,12 @@ import { firebaseInterface } from '../../../firebase/firebaseInterface';
 import { setMessages } from '../../messages/slice';
 import { getEmailKey } from './utils';
 
+type SetMessage = {
+    user: string;
+    message: string;
+    dateKey: number;
+}
+
 export const messagesEndpoint = firebaseApi.injectEndpoints({
     overrideExisting: false,
     endpoints: (build) => ({
@@ -35,9 +41,8 @@ export const messagesEndpoint = firebaseApi.injectEndpoints({
                 firebaseInterface.unsubscribeListener(data);
             },
         }),
-        setMessage: build.mutation<string, { message: string, user: string }>({
-            async queryFn({ message, user }) {
-                const dateKey = Date.now();
+        setMessage: build.mutation<SetMessage, SetMessage>({
+            async queryFn({ message, user, dateKey }) {
                 try {
                     await firebaseInterface.setValue(
                         `/messages/${user}/${getEmailKey()}/${dateKey}`,
@@ -47,7 +52,33 @@ export const messagesEndpoint = firebaseApi.injectEndpoints({
                         `/messages/${getEmailKey()}/${user}/${dateKey}`,
                         { value: message, mine: true }
                     );
-                    return { data: message };
+                    return { data: { dateKey, message, user } };
+                } catch (error) {
+                    return { error };
+                }
+            },
+        }),
+        setToxicity: build.mutation<void, { user: string, dateKey: number }>({
+            async queryFn({ dateKey, user }) {
+                try {
+                    await firebaseInterface.setValue(
+                        `/messages/${user}/${getEmailKey()}/${dateKey}/toxicity`,
+                        true
+                    );
+                    return { data: null };
+                } catch (error) {
+                    return { error };
+                }
+            },
+        }),
+        removeToxicity: build.mutation<void, { user: string, dateKey: number}>({
+            async queryFn({ dateKey, user }) {
+                try {
+                    await firebaseInterface.setValue(
+                        `/messages/${getEmailKey()}/${user}/${dateKey}/toxicity`,
+                        false
+                    );
+                    return { data: null };
                 } catch (error) {
                     return { error };
                 }
@@ -56,4 +87,4 @@ export const messagesEndpoint = firebaseApi.injectEndpoints({
     }),
 });
 
-export const { useSetMessageMutation, useMessagesQuery } = messagesEndpoint;
+export const { useSetMessageMutation, useMessagesQuery, useSetToxicityMutation, useRemoveToxicityMutation } = messagesEndpoint;

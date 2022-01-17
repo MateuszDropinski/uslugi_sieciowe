@@ -15,7 +15,7 @@ const messagesSlice = createSlice({
     reducers: {
         setMessages: (
             state,
-            action: PayloadAction<{ [key: string]: { value: string, mine: boolean, key: string }[] }>
+            action: PayloadAction<Messages>
         ) => {
             state.data = action.payload;
         },

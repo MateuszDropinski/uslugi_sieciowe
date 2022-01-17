@@ -48,6 +48,8 @@
     "dependencies": {
         "@fontsource/poppins": "^4.5.0",
         "@reduxjs/toolkit": "^1.6.2",
+        "@tensorflow-models/toxicity": "^1.2.2",
+        "@tensorflow/tfjs": "^3.13.0",
         "date-fns": "^2.27.0",
         "dotenv-webpack": "^7.0.3",
         "eslint": "^8.0.1",

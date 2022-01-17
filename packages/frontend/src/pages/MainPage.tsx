@@ -8,7 +8,7 @@ import { Loader } from '../components/Loader/Loader';
 import { UserData } from '../components/UserData/UserData';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { Chat } from '../components/Chat/Chat';
-import { getColor, LightnessLevel } from '../theme';
+import { getColor } from '../theme';
 import { useMessagesQuery } from '../store/firebaseApi/endpoints/messages';
 
 const StyledWrapper = styled.div`
@@ -16,7 +16,6 @@ const StyledWrapper = styled.div`
     align-items: center;
     justify-content: center;
 
-    background: ${getColor('main', { gradient: true, lightnessOffset: LightnessLevel.Lighter1 })};
     width: 100vw;
     height: 100vh;
 `;

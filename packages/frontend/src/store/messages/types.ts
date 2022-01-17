@@ -1,7 +1,8 @@
 export type Message = {
-    key: string;
+    key: number;
     value: string;
     mine: boolean;
+    toxicity: boolean;
 }
 
 export type Messages = {

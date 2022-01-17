@@ -32,7 +32,7 @@ const GlobalStyles = createGlobalStyle<{ theme: Theme }>`
     body {
         margin: 0;
 
-        background: ${getColor('background')};
+        background: ${getColor('main', { gradient: true, lightnessOffset: LightnessLevel.Lighter1 })};
 
         color: ${getFontColor('primaryDark')};
         font-family: ${getFontFamily('main')};

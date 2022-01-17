@@ -4,7 +4,7 @@ import * as _ from 'lodash/fp';
 import { State } from '../types';
 import { UsersState } from './slice';
 import { User } from './types';
-import { firebaseInterface } from '../../firebase/firebaseInterface';
+import { getEmailKey } from '../firebaseApi/endpoints/utils';
 
 export const usersSelector = (state: State): UsersState => state.users;
 
@@ -20,7 +20,7 @@ export const usersDataSelector = createSelector(
 
 export const usersDataCurrentSelector = createSelector(
     usersDataSelector,
-    _.find<User>(({ email }) => email === firebaseInterface.getCurrentUser().email)
+    _.find<User>(({ email }) => email === getEmailKey())
 );
 
 export const usersDataWithoutCurrentSelector = createSelector(

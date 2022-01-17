@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import * as _ from 'lodash/fp';
+import '@tensorflow/tfjs';
+import * as toxicity from '@tensorflow-models/toxicity';
 
 import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
@@ -10,7 +12,12 @@ import {
     messagesActiveConversationSelector,
     messagesActiveUserSelector,
 } from '../../store/messages/selectors';
-import { useSetMessageMutation } from '../../store/firebaseApi/endpoints/messages';
+import {
+    useRemoveToxicityMutation,
+    useSetMessageMutation,
+    useSetToxicityMutation,
+} from '../../store/firebaseApi/endpoints/messages';
+import { Message } from '../../store/messages/types';
 
 const StyledWrapper = styled.div`
     display: flex;
@@ -57,7 +64,7 @@ const SelectUser = styled.div`
     font-size: ${getFontSize('h3')};
 `;
 
-const Message = styled.div<{ isMine: boolean }>`
+const StyledMessage = styled.div<{ isMine: boolean }>`
     display: flex;
     align-self: ${({ isMine }) => isMine ? 'flex-end' : 'flex-start'};
     max-width: 50%;
@@ -70,17 +77,54 @@ const Message = styled.div<{ isMine: boolean }>`
     font-size: ${getFontSize('normal')};
 `;
 
+const ToxicMessage = styled.div`
+    color: ${getColor('red')};
+    text-decoration: underline;
+    cursor: pointer;
+`;
+
 export const Chat = () => {
-    const [setMessageMutation] = useSetMessageMutation();
+    const [setMessageMutation, { data }] = useSetMessageMutation();
+    const [setMessageToxicity] = useSetToxicityMutation();
+    const [removeMessageToxicity] = useRemoveToxicityMutation();
 
     const [message, setMessage] = React.useState('');
+    const [toxicityModel, setToxicityModel] = React.useState<toxicity.ToxicityClassifier>();
 
     const activeUser = useAppSelector(messagesActiveUserSelector);
     const activeConversation = useAppSelector(messagesActiveConversationSelector);
 
-    const onClick = () => {
-        setMessageMutation({ message, user: activeUser });
+    React.useEffect(() => {
+        const loadModel = async () => {
+            // @ts-ignore
+            const model = await toxicity.load(.7);
+            setToxicityModel(model);
+        };
+        loadModel();
+    }, []);
+
+    React.useEffect(() => {
+        const classify = async () => {
+            const predictions = await toxicityModel.classify([data.message]);
+            if (predictions.some(({ results }) => results[0].match)) {
+                setMessageToxicity({ dateKey: data.dateKey, user: data.user });
+            }
+        };
+
+        toxicityModel && data && classify();
+    }, [data, toxicityModel]);
+
+    React.useEffect(() => {
         setMessage('');
+    }, [activeUser]);
+
+    const onClick = () => {
+        setMessageMutation({ message, user: activeUser, dateKey: Date.now() });
+        setMessage('');
+    };
+
+    const onToxicTextClick = (dateKey: number) => {
+        removeMessageToxicity({ dateKey, user: activeUser });
     };
 
     if (!activeUser) {
@@ -98,8 +142,17 @@ export const Chat = () => {
             <Messages>
                 {
                     _.flowRight(
-                        _.map(({ key, value, mine }) => (
-                            <Message key={key} isMine={mine}>{value}</Message>
+                        _.map<Message, React.ReactElement>(({ key, value, mine, toxicity }) => (
+                            <StyledMessage key={key} isMine={mine}>
+                                {toxicity
+                                    ? (
+                                        <ToxicMessage onClick={() => onToxicTextClick(key)}>
+                                            This message contains toxic text, click to show it.
+                                        </ToxicMessage>
+                                    )
+                                    : value
+                                }
+                            </StyledMessage>
                         )),
                         _.reverse
                     )(activeConversation)
