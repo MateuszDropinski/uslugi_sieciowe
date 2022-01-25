@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useSignInMutation } from '../store/firebaseApi/endpoints/signIn';
 import { Button } from '../components/Button/Button';
 import { Input } from '../components/Input/Input';
+import { getColor } from '../theme';
 
 const StyledWrapper = styled.div`
     display: flex;
@@ -20,6 +21,7 @@ const StyledContent = styled.div`
     justify-content: center;
     gap: 2rem;
 
+    background-color: ${getColor('background')};
     border-radius: 8px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     padding: 2rem;

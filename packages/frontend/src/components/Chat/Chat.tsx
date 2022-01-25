@@ -1,8 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import * as _ from 'lodash/fp';
-import '@tensorflow/tfjs';
-import * as toxicity from '@tensorflow-models/toxicity';
 
 import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
@@ -15,7 +13,6 @@ import {
 import {
     useRemoveToxicityMutation,
     useSetMessageMutation,
-    useSetToxicityMutation,
 } from '../../store/firebaseApi/endpoints/messages';
 import { Message } from '../../store/messages/types';
 
@@ -84,35 +81,13 @@ const ToxicMessage = styled.div`
 `;
 
 export const Chat = () => {
-    const [setMessageMutation, { data }] = useSetMessageMutation();
-    const [setMessageToxicity] = useSetToxicityMutation();
+    const [setMessageMutation] = useSetMessageMutation();
     const [removeMessageToxicity] = useRemoveToxicityMutation();
 
     const [message, setMessage] = React.useState('');
-    const [toxicityModel, setToxicityModel] = React.useState<toxicity.ToxicityClassifier>();
 
     const activeUser = useAppSelector(messagesActiveUserSelector);
     const activeConversation = useAppSelector(messagesActiveConversationSelector);
-
-    React.useEffect(() => {
-        const loadModel = async () => {
-            // @ts-ignore
-            const model = await toxicity.load(.7);
-            setToxicityModel(model);
-        };
-        loadModel();
-    }, []);
-
-    React.useEffect(() => {
-        const classify = async () => {
-            const predictions = await toxicityModel.classify([data.message]);
-            if (predictions.some(({ results }) => results[0].match)) {
-                setMessageToxicity({ dateKey: data.dateKey, user: data.user });
-            }
-        };
-
-        toxicityModel && data && classify();
-    }, [data, toxicityModel]);
 
     React.useEffect(() => {
         setMessage('');

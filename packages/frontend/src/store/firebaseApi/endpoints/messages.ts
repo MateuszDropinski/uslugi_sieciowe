@@ -1,9 +1,18 @@
 import * as _ from 'lodash/fp';
+import '@tensorflow/tfjs';
+import * as toxicity from '@tensorflow-models/toxicity';
 
 import { firebaseApi } from '../firebaseApi';
 import { firebaseInterface } from '../../../firebase/firebaseInterface';
 import { setMessages } from '../../messages/slice';
 import { getEmailKey } from './utils';
+
+let model;
+
+const loadModel = async () => {
+    //@ts-ignore
+    model = await toxicity.load(.7);
+};
 
 type SetMessage = {
     user: string;
@@ -43,29 +52,22 @@ export const messagesEndpoint = firebaseApi.injectEndpoints({
         }),
         setMessage: build.mutation<SetMessage, SetMessage>({
             async queryFn({ message, user, dateKey }) {
+                model || await loadModel();
                 try {
-                    await firebaseInterface.setValue(
-                        `/messages/${user}/${getEmailKey()}/${dateKey}`,
-                        { value: message, mine: false }
-                    );
                     await firebaseInterface.setValue(
                         `/messages/${getEmailKey()}/${user}/${dateKey}`,
                         { value: message, mine: true }
                     );
-                    return { data: { dateKey, message, user } };
-                } catch (error) {
-                    return { error };
-                }
-            },
-        }),
-        setToxicity: build.mutation<void, { user: string, dateKey: number }>({
-            async queryFn({ dateKey, user }) {
-                try {
+                    const predictions = await model.classify([message]);
                     await firebaseInterface.setValue(
-                        `/messages/${user}/${getEmailKey()}/${dateKey}/toxicity`,
-                        true
+                        `/messages/${user}/${getEmailKey()}/${dateKey}`,
+                        {
+                            value: message,
+                            mine: false,
+                            toxicity: predictions.some(({ results }) => results[0].match),
+                        }
                     );
-                    return { data: null };
+                    return { data: { dateKey, message, user } };
                 } catch (error) {
                     return { error };
                 }
@@ -87,4 +89,4 @@ export const messagesEndpoint = firebaseApi.injectEndpoints({
     }),
 });
 
-export const { useSetMessageMutation, useMessagesQuery, useSetToxicityMutation, useRemoveToxicityMutation } = messagesEndpoint;
+export const { useSetMessageMutation, useMessagesQuery, useRemoveToxicityMutation } = messagesEndpoint;
